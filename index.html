@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Автозапчасти - Подбор запчастей с ИИ</title>
+    <title>AI AutoParts - Умный подбор запчастей</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,11 +12,25 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: #ffffff;
             overflow-x: hidden;
         }
 
@@ -25,566 +40,634 @@
             padding: 20px;
         }
 
+        /* Header */
         header {
             text-align: center;
-            padding: 30px 0;
+            padding: 40px 0;
+            margin-bottom: 30px;
         }
 
-        header h1 {
+        h1 {
             font-size: 2.5rem;
-            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 10px;
         }
 
-        header p {
-            color: #a0a0a0;
+        .subtitle {
+            color: var(--text-secondary);
             font-size: 1.1rem;
         }
 
-        /* Glass Card Style */
+        /* Glass Card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px;
+            padding: 30px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
 
-        /* Vehicle Management Section */
-        .vehicle-section {
-            display: flex;
+        .glass-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Vehicle Form */
+        .vehicle-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .vehicle-list {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .vehicle-list h3 {
-            margin-bottom: 15px;
-            color: #00d9ff;
-            font-size: 1.2rem;
-        }
-
-        .vehicle-item {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .vehicle-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
-        }
-
-        .vehicle-item.active {
-            border-color: #00d9ff;
-            background: rgba(0, 217, 255, 0.1);
-        }
-
-        .vehicle-item .vin {
-            font-weight: bold;
-            color: #00ff88;
-            font-size: 0.9rem;
-        }
-
-        .vehicle-item .info {
-            color: #b0b0b0;
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        .vehicle-item .delete-btn {
-            float: right;
-            background: rgba(255, 50, 50, 0.2);
-            border: none;
-            color: #ff6b6b;
-            padding: 5px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-        }
-
-        .vehicle-item .delete-btn:hover {
-            background: rgba(255, 50, 50, 0.4);
-        }
-
-        /* Add Vehicle Form */
-        .add-vehicle-form {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .add-vehicle-form h3 {
-            margin-bottom: 15px;
-            color: #00d9ff;
-            font-size: 1.2rem;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #c0c0c0;
+        label {
+            color: var(--text-secondary);
             font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
+        input, select {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
-            color: #ffffff;
+            padding: 14px 16px;
+            color: var(--text-primary);
             font-size: 1rem;
             transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
             outline: none;
-            border-color: #00d9ff;
-            background: rgba(255, 255, 255, 0.08);
         }
 
-        .form-group select option {
-            background: #1a1a2e;
-            color: #ffffff;
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
         .btn {
-            padding: 12px 25px;
+            padding: 14px 28px;
             border: none;
             border-radius: 12px;
             font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #00d9ff, #00ff88);
-            color: #1a1a2e;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .btn-danger {
-            background: rgba(255, 50, 50, 0.2);
-            color: #ff6b6b;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .btn-danger:hover {
-            background: rgba(255, 50, 50, 0.4);
+            background: rgba(239, 68, 68, 0.3);
         }
 
-        /* Chat Section */
-        .chat-section {
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
             margin-top: 20px;
         }
 
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        /* Saved Vehicles */
+        .saved-vehicles {
+            margin-top: 30px;
         }
 
-        .chat-header h3 {
-            color: #00d9ff;
-            font-size: 1.2rem;
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .current-vehicle-info {
-            background: rgba(0, 217, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
+        .vehicle-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .vehicle-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .vehicle-item.active {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .vehicle-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .vehicle-info p {
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            color: #00ff88;
+            margin-bottom: 4px;
+        }
+
+        .delete-vehicle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: var(--error);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-item:hover .delete-vehicle {
+            opacity: 1;
+        }
+
+        .delete-vehicle:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            margin-top: 30px;
         }
 
         .chat-messages {
-            height: 400px;
+            height: 500px;
             overflow-y: auto;
-            padding: 15px;
+            padding: 20px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 15px;
-            margin-bottom: 15px;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(0, 217, 255, 0.3);
-            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
         }
 
         .message {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .message.user {
-            text-align: right;
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
         }
 
-        .message.ai {
-            text-align: left;
+        .message-user .message-content {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 70%;
         }
 
-        .message-content {
-            display: inline-block;
-            padding: 12px 18px;
-            border-radius: 18px;
-            max-width: 80%;
-            word-wrap: break-word;
+        .message-ai {
+            display: flex;
+            justify-content: flex-start;
         }
 
-        .message.user .message-content {
-            background: linear-gradient(135deg, #00d9ff, #00ff88);
-            color: #1a1a2e;
-            border-bottom-right-radius: 5px;
-        }
-
-        .message.ai .message-content {
+        .message-ai .message-content {
             background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border-bottom-left-radius: 5px;
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 18px 18px 18px 4px;
+            max-width: 70%;
+            border: 1px solid var(--glass-border);
         }
 
-        .parts-result {
-            background: rgba(0, 255, 136, 0.05);
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 10px;
+        .message-content strong {
+            color: var(--accent);
         }
 
-        .parts-result h4 {
-            color: #00ff88;
-            margin-bottom: 10px;
-            font-size: 1rem;
+        .message-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .message-content li {
+            margin: 5px 0;
         }
 
         .part-number {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            background: rgba(99, 102, 241, 0.2);
+            padding: 2px 8px;
+            border-radius: 6px;
             font-family: 'Courier New', monospace;
+            font-weight: 600;
         }
 
-        .part-number .label {
-            color: #00d9ff;
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-
-        .part-number .value {
-            color: #ffffff;
-            font-size: 1rem;
-            margin-top: 5px;
-        }
-
-        .chat-input-area {
+        .chat-input-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .chat-input-area input {
+        .chat-input {
             flex: 1;
-            padding: 15px 20px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
             border-radius: 15px;
-            color: #ffffff;
+            padding: 16px 20px;
+            color: var(--text-primary);
             font-size: 1rem;
-        }
-
-        .chat-input-area input:focus {
             outline: none;
-            border-color: #00d9ff;
+            transition: all 0.3s ease;
         }
 
-        .typing-indicator {
-            display: inline-flex;
-            gap: 5px;
-            padding: 10px 15px;
+        .chat-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
-        .typing-indicator span {
+        .chat-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
             width: 8px;
             height: 8px;
-            background: #00d9ff;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--error);
+        }
+
+        .status-error .status-dot {
+            background: var(--error);
+        }
+
+        /* Loading */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
 
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-10px);
-            }
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
         }
 
-        /* Welcome Message */
-        .welcome-message {
-            text-align: center;
-            padding: 50px 20px;
-            color: #a0a0a0;
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .welcome-message h3 {
-            color: #00d9ff;
-            margin-bottom: 15px;
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
         }
 
-        .welcome-message p {
-            margin-bottom: 10px;
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            header h1 {
+            h1 {
                 font-size: 1.8rem;
             }
 
-            .vehicle-section {
-                flex-direction: column;
+            .vehicle-form {
+                grid-template-columns: 1fr;
             }
 
             .chat-messages {
-                height: 300px;
+                height: 400px;
+            }
+
+            .message-content {
+                max-width: 85%;
             }
         }
 
-        /* Loading State */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
+        .hidden {
+            display: none;
         }
 
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #00d9ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .fade-in {
+            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚗 AI Автозапчасти</h1>
-            <p>Интеллектуальный подбор запчастей с помощью искусственного интеллекта</p>
+            <h1>🚗 AI AutoParts</h1>
+            <p class="subtitle">Умный подбор автозапчастей с искусственным интеллектом</p>
         </header>
 
-        <!-- Vehicle Management -->
-        <div class="vehicle-section">
-            <div class="glass-card vehicle-list">
-                <h3>📋 Мои автомобили</h3>
-                <div id="vehicleListContainer">
-                    <p style="color: #a0a0a0; text-align: center; padding: 20px;">
-                        Добавьте свой первый автомобиль для начала работы
-                    </p>
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Проверка подключения к ИИ...</span>
+        </div>
+
+        <!-- Vehicle Selection Form -->
+        <div class="glass-card">
+            <h2 style="margin-bottom: 20px; font-size: 1.5rem;">📋 Данные автомобиля</h2>
+            <form id="vehicleForm" class="vehicle-form">
+                <div class="form-group">
+                    <label for="vin">VIN номер *</label>
+                    <input 
+                        type="text" 
+                        id="vin" 
+                        placeholder="Введите 17 символов VIN" 
+                        maxlength="17"
+                        required
+                    >
                 </div>
+                <div class="form-group">
+                    <label for="year">Год выпуска *</label>
+                    <select id="year" required>
+                        <option value="">Выберите год</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="engine">Объём двигателя (л)</label>
+                    <input 
+                        type="text" 
+                        id="engine" 
+                        placeholder="Например: 2.0"
+                    >
+                </div>
+            </form>
+            <div class="button-group">
+                <button type="button" id="detectBtn" class="btn btn-primary">
+                    🔍 Определить автомобиль
+                </button>
+                <button type="button" id="saveVehicleBtn" class="btn btn-secondary" disabled>
+                    💾 Сохранить автомобиль
+                </button>
             </div>
 
-            <div class="glass-card add-vehicle-form">
-                <h3>➕ Добавить автомобиль</h3>
-                <form id="addVehicleForm">
-                    <div class="form-group">
-                        <label for="vin">VIN номер *</label>
-                        <input type="text" id="vin" placeholder="Введите 17-значный VIN" maxlength="17" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="year">Год выпуска *</label>
-                        <select id="year" required>
-                            <option value="">Выберите год</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="engine">Объём двигателя (л) *</label>
-                        <select id="engine" required>
-                            <option value="">Выберите объём</option>
-                            <option value="1.0">1.0 L</option>
-                            <option value="1.2">1.2 L</option>
-                            <option value="1.4">1.4 L</option>
-                            <option value="1.5">1.5 L</option>
-                            <option value="1.6">1.6 L</option>
-                            <option value="1.8">1.8 L</option>
-                            <option value="2.0">2.0 L</option>
-                            <option value="2.4">2.4 L</option>
-                            <option value="2.5">2.5 L</option>
-                            <option value="3.0">3.0 L</option>
-                            <option value="3.5">3.5 L</option>
-                            <option value="4.0">4.0 L</option>
-                            <option value="5.0">5.0 L</option>
-                            <option value="6.0">6.0 L</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        Определить автомобиль
-                    </button>
-                </form>
+            <!-- Saved Vehicles -->
+            <div class="saved-vehicles">
+                <h3 style="margin-top: 30px; font-size: 1.2rem;">💼 Мои автомобили</h3>
+                <div id="vehiclesGrid" class="vehicles-grid">
+                    <p style="color: var(--text-secondary); grid-column: 1/-1;">Нет сохранённых автомобилей</p>
+                </div>
             </div>
         </div>
 
-        <!-- Chat Section -->
-        <div class="glass-card chat-section">
-            <div class="chat-header">
-                <h3>💬 Чат с ИИ агентом</h3>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <span id="currentVehicleInfo" class="current-vehicle-info" style="display: none;"></span>
-                    <button id="clearChatBtn" class="btn btn-secondary" onclick="clearChat()">
-                        🗑️ Очистить чат
-                    </button>
-                </div>
+        <!-- Current Vehicle Info -->
+        <div id="currentVehicleInfo" class="glass-card hidden fade-in">
+            <h2 style="margin-bottom: 15px; font-size: 1.3rem;">✅ Выбранный автомобиль</h2>
+            <div id="vehicleDetails"></div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div id="chatContainer" class="glass-card chat-container hidden fade-in">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-size: 1.3rem;">💬 Чат с ИИ агентом</h2>
+                <button id="clearChatBtn" class="btn btn-danger">
+                    🗑️ Очистить чат
+                </button>
             </div>
             
             <div id="chatMessages" class="chat-messages">
-                <div class="welcome-message">
-                    <h3>Добро пожаловать!</h3>
-                    <p>Для начала работы:</p>
-                    <p>1. Добавьте автомобиль через форму слева</p>
-                    <p>2. Выберите автомобиль из списка</p>
-                    <p>3. Спросите ИИ о нужной запчасти</p>
-                </div>
+                <!-- Messages will be added here -->
             </div>
-
-            <div class="chat-input-area">
+            
+            <div class="chat-input-container">
                 <input 
                     type="text" 
                     id="chatInput" 
-                    placeholder="Введите название запчасти (например: Стойка стабилизатора)..."
+                    class="chat-input" 
+                    placeholder="Какая запчасть вас интересует? Например: стойка стабилизатора..."
                     disabled
                 >
-                <button id="sendBtn" class="btn btn-primary" onclick="sendMessage()" disabled>
-                    Отправить
+                <button id="sendBtn" class="btn btn-primary" disabled>
+                    ➤
                 </button>
             </div>
         </div>
     </div>
 
     <script type="module">
-        import { OpenRouter } from "https://cdn.jsdelivr.net/npm/@openrouter/sdk@latest/+esm";
+        import { OpenRouter } from "https://cdn.jsdelivr.net/npm/@openrouter/sdk@+latest/+esm";
 
-        // Initialize OpenRouter with API key
+        // Configuration
+        const API_KEY = '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';
+        // Список моделей: бесплатные, с доступом в интернет (или свежими данными), хорошие в логике
+        const MODELS = [
+            "google/gemini-2.0-flash-exp:free", // Экспериментальная, очень быстрая и умная, есть поиск
+            "google/gemini-pro-1.5:free",      // Стабильная версия с большим контекстом
+            "mistralai/mistral-large-2411:free", // Отличная логика
+            "qwen/qwen-2.5-coder-32b-instruct:free", // Хороша в коде и структурированных данных
+            "meta-llama/llama-3.3-70b-instruct:free" // Мощная логическая модель
+        ];
+        let currentModelIndex = 0;
+
+        // Initialize OpenRouter
         const openrouter = new OpenRouter({
-            apiKey: "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"
+            apiKey: API_KEY,
+            headers: {
+                'HTTP-Referer': window.location.origin,
+                'X-Title': 'AI AutoParts Selector'
+            }
         });
 
-        // AI System Instruction
-        const SYSTEM_INSTRUCTION = `Ты - профессиональный ИИ-агент по подбору автозапчастей. Твоя задача:
+        // Helper function to get AI response with model fallback
+        async function getAIResponse(messages, useStream = false) {
+            let lastError = null;
+            
+            for (let i = 0; i < MODELS.length; i++) {
+                const modelIndex = (currentModelIndex + i) % MODELS.length;
+                const currentModel = MODELS[modelIndex];
+                
+                try {
+                    const response = await openrouter.chat.send({
+                        model: currentModel,
+                        messages: messages,
+                        stream: useStream
+                    });
+                    currentModelIndex = modelIndex;
+                    return response;
+                } catch (modelError) {
+                    lastError = modelError;
+                    console.warn(`Модель ${currentModel} не ответила:`, modelError.message);
+                    continue;
+                }
+            }
+            
+            throw new Error(`Ни одна модель не ответила. Последняя ошибка: ${lastError?.message || 'Неизвестная ошибка'}`);
+        }
 
-1. ПРИВЕТСТВИЕ: Когда пользователь выбирает автомобиль, поприветствуй его и спроси, какая запчасть ему нужна.
-
-2. ОПРЕДЕЛЕНИЕ АВТОМОБИЛЯ: На основе VIN, года выпуска и объёма двигателя определи марку, модель и модификацию автомобиля.
-
-3. ПОДБОР ЗАПЧАСТЕЙ: Когда пользователь называет запчасть:
-   - Определи точное название запчасти
-   - Найди оригинальный номер запчасти (OEM номер) для данного автомобиля
-   - Предоставь 3-5 подходящих аналогов от известных производителей
-   - Укажи производителя для каждого аналога
-
-4. ФОРМАТ ОТВЕТА: Всегда отвечай в следующем формате:
-
-🚗 Автомобиль: [Марка Модель Год Двигатель]
-
-🔧 Запчасть: [Название запчасти]
-
-✅ ОРИГИНАЛЬНЫЙ НОМЕР:
-[OEM номер]
-
-🔄 АНАЛОГИ:
-• [Производитель 1] - [Номер аналога]
-• [Производитель 2] - [Номер аналога]
-• [Производитель 3] - [Номер аналога]
-
-💡 Рекомендация: [Краткая рекомендация по выбору]
-
-5. СТИЛЬ ОБЩЕНИЯ: Будь дружелюбным, профессиональным и полезным. Задавай уточняющие вопросы если нужно.
-
-6. ЯЗЫК: Всегда отвечай на русском языке.`;
-
-        // State management
-        let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+        // State
         let currentVehicle = null;
+        let savedVehicles = JSON.parse(localStorage.getItem('savedVehicles') || '[]');
         let chatHistory = [];
-        let vehicleChatHistories = {};
+        let isAITyping = false;
 
-        // Populate year dropdown
-        function populateYearDropdown() {
-            const yearSelect = document.getElementById('year');
+        // System prompt for AI agent
+        const SYSTEM_PROMPT = `Ты - профессиональный ИИ-агент по подбору автозапчастей. Твоя задача:
+
+1. Сначала определи автомобиль по VIN-коду, году выпуска и объёму двигателя.
+   - VIN-код содержит 17 символов и включает информацию о производителе, модели, годе выпуска и других характеристиках.
+   - Сопоставь VIN с годом выпуска для точной идентификации.
+   - Определи марку, модель, поколение, тип кузова и двигатель автомобиля.
+
+2. После определения автомобиля спроси пользователя, какая запчасть ему нужна.
+   - Будь вежливым и профессиональным.
+   - Задавай уточняющие вопросы при необходимости (например, передняя или задняя стойка, левая или правая сторона).
+
+3. Когда пользователь указал запчасть:
+   - Используй свои знания и доступ в интернет для поиска информации.
+   - Найди ОРИГИНАЛЬНЫЙ номер запчасти (OEM number) для данного автомобиля.
+   - Найди ПОДХОДЯЩИЕ АНАЛОГИ от других производителей (Aftermarket parts).
+   - Укажи производителей аналогов (например: Bosch, Febi Bilstein, Lemforder, TRW, Delphi и т.д.).
+
+4. Формат ответа:
+   - Название запчасти
+   - Оригинальный номер (OEM): [номер]
+   - Подходящие аналоги:
+     • [Производитель]: [номер]
+     • [Производитель]: [номер]
+   - Краткие рекомендации по выбору (если уместно)
+
+5. Если информация недоступна или неточна:
+   - Честно сообщи об этом пользователю.
+   - Предложи альтернативные способы проверки (обратиться к дилеру, проверить по каталогу).
+
+6. Всегда используй русский язык для общения.
+7. Будь точным и проверяй информацию через поиск в интернете.
+8. Для популярных запчастей (фильтры, колодки, свечи) можешь давать несколько вариантов на выбор.`;
+
+        // DOM Elements
+        const vinInput = document.getElementById('vin');
+        const yearSelect = document.getElementById('year');
+        const engineInput = document.getElementById('engine');
+        const detectBtn = document.getElementById('detectBtn');
+        const saveVehicleBtn = document.getElementById('saveVehicleBtn');
+        const vehiclesGrid = document.getElementById('vehiclesGrid');
+        const currentVehicleInfo = document.getElementById('currentVehicleInfo');
+        const vehicleDetails = document.getElementById('vehicleDetails');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        // Initialize
+        function init() {
+            populateYearSelect();
+            renderSavedVehicles();
+            checkConnection();
+            
+            // Load saved vehicle if exists
+            const lastActiveVehicle = localStorage.getItem('lastActiveVehicle');
+            if (lastActiveVehicle) {
+                const vehicle = savedVehicles.find(v => v.id === lastActiveVehicle);
+                if (vehicle) {
+                    selectVehicle(vehicle);
+                }
+            }
+        }
+
+        // Populate year select
+        function populateYearSelect() {
             const currentYear = new Date().getFullYear();
-            for (let year = currentYear; year >= 1990; year--) {
+            for (let year = currentYear + 1; year >= 1980; year--) {
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
@@ -592,382 +675,575 @@
             }
         }
 
-        // Render vehicle list
-        function renderVehicleList() {
-            const container = document.getElementById('vehicleListContainer');
-            
-            if (vehicles.length === 0) {
-                container.innerHTML = `
-                    <p style="color: #a0a0a0; text-align: center; padding: 20px;">
-                        Добавьте свой первый автомобиль для начала работы
-                    </p>
+        // Check AI connection
+        async function checkConnection() {
+            try {
+                let response = null;
+                let lastError = null;
+                
+                // Пробуем подключиться через доступные модели
+                for (const model of MODELS) {
+                    try {
+                        response = await openrouter.chat.send({
+                            model: model,
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: 'Ответь только "Да" если ты подключен и готов работать.'
+                                }
+                            ],
+                            stream: false
+                        });
+                        // Если успешно, запоминаем модель и выходим
+                        currentModelIndex = MODELS.indexOf(model);
+                        break;
+                    } catch (modelError) {
+                        lastError = modelError;
+                        console.warn(`Модель ${model} не ответила при проверке:`, modelError.message);
+                        continue;
+                    }
+                }
+                
+                if (!response) {
+                    throw new Error(`Ни одна модель не ответила. Последняя ошибка: ${lastError?.message || 'Неизвестная ошибка'}`);
+                }
+
+                const content = response.choices[0]?.message?.content || '';
+                
+                if (content.toLowerCase().includes('да') || content.length > 0) {
+                    connectionStatus.innerHTML = `
+                        <div class="status-dot"></div>
+                        <span>✅ ИИ подключен и готов к работе (${MODELS[currentModelIndex]})</span>
+                    `;
+                    connectionStatus.classList.remove('status-error');
+                } else {
+                    throw new Error('Некорректный ответ от ИИ');
+                }
+            } catch (error) {
+                console.error('Connection error:', error);
+                connectionStatus.innerHTML = `
+                    <div class="status-dot"></div>
+                    <span>❌ Ошибка подключения: ${error.message}</span>
                 `;
+                connectionStatus.classList.add('status-error');
+            }
+        }
+
+        // Detect vehicle using AI
+        async function detectVehicle() {
+            const vin = vinInput.value.trim().toUpperCase();
+            const year = yearSelect.value;
+            const engine = engineInput.value.trim();
+
+            if (!vin || !year) {
+                showNotification('Пожалуйста, заполните VIN и год выпуска', 'error');
                 return;
             }
 
-            container.innerHTML = vehicles.map(vehicle => `
-                <div class="vehicle-item ${currentVehicle?.vin === vehicle.vin ? 'active' : ''}" 
-                     onclick="selectVehicle('${vehicle.vin}')">
-                    <button class="delete-btn" onclick="event.stopPropagation(); deleteVehicle('${vehicle.vin}')">✕</button>
-                    <div class="vin">VIN: ${vehicle.vin}</div>
-                    <div class="info">${vehicle.detectedInfo || 'Определение...'}</div>
-                    <div class="info">${vehicle.year} г., ${vehicle.engine}L</div>
-                </div>
-            `).join('');
+            if (vin.length !== 17) {
+                showNotification('VIN должен содержать 17 символов', 'error');
+                return;
+            }
+
+            disableForm(true);
+            detectBtn.innerHTML = '⏳ Определение...';
+
+            try {
+                const prompt = `Проанализируй следующий автомобиль:
+- VIN код: ${vin}
+- Год выпуска: ${year}
+- Объём двигателя: ${engine || 'не указан'}
+
+Расшифруй VIN код и определи:
+1. Марку автомобиля
+2. Модель
+3. Поколение/год выпуска
+4. Тип кузова
+5. Двигатель (объём, мощность, тип топлива)
+6. Привод
+
+Ответ дай в формате JSON:
+{
+  "make": "Марка",
+  "model": "Модель",
+  "generation": "Поколение",
+  "bodyType": "Тип кузова",
+  "engine": "Двигатель",
+  "driveType": "Привод",
+  "fullName": "Полное название автомобиля"
+}
+
+Если не можешь точно определить, укажи наиболее вероятный вариант.`;
+
+                const response = await getAIResponse([
+                    {
+                        role: 'system',
+                        content: 'Ты эксперт по расшифровке VIN кодов автомобилей. Отвечай точно и профессионально.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ]);
+
+                const content = response.choices[0]?.message?.content || '{}';
+                
+                // Try to parse JSON from response
+                let vehicleData;
+                try {
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        vehicleData = JSON.parse(jsonMatch[0]);
+                    } else {
+                        throw new Error('No JSON found');
+                    }
+                } catch (e) {
+                    // Fallback: create object from text response
+                    vehicleData = {
+                        make: 'Не определено',
+                        model: 'Не определено',
+                        generation: year,
+                        bodyType: 'Не определено',
+                        engine: engine || 'Не указан',
+                        driveType: 'Не определено',
+                        fullName: `Автомобиль ${vin}`
+                    };
+                }
+
+                currentVehicle = {
+                    id: Date.now().toString(),
+                    vin: vin,
+                    year: year,
+                    engine: engine,
+                    ...vehicleData,
+                    createdAt: new Date().toISOString()
+                };
+
+                displayCurrentVehicle(currentVehicle);
+                initializeChat(currentVehicle);
+                
+                saveVehicleBtn.disabled = false;
+                showNotification('Автомобиль успешно определён!', 'success');
+
+            } catch (error) {
+                console.error('Detection error:', error);
+                showNotification(`Ошибка определения: ${error.message}`, 'error');
+            } finally {
+                disableForm(false);
+                detectBtn.innerHTML = '🔍 Определить автомобиль';
+            }
         }
 
-        // Select vehicle
-        window.selectVehicle = function(vin) {
-            currentVehicle = vehicles.find(v => v.vin === vin);
-            
-            // Load or initialize chat history for this vehicle
-            if (!vehicleChatHistories[vin]) {
-                vehicleChatHistories[vin] = [];
-                // Add welcome message
-                addMessage('ai', `Здравствуйте! Я определил ваш автомобиль: **${currentVehicle.detectedInfo}** (${currentVehicle.year} год, двигатель ${currentVehicle.engine}L).\n\nКакая запчасть вас интересует?`);
-            }
-            
-            renderVehicleList();
-            renderChat();
-            updateCurrentVehicleInfo();
-            enableChat();
-        };
-
-        // Delete vehicle
-        window.deleteVehicle = function(vin) {
-            vehicles = vehicles.filter(v => v.vin !== vin);
-            localStorage.setItem('vehicles', JSON.stringify(vehicles));
-            delete vehicleChatHistories[vin];
-            
-            if (currentVehicle?.vin === vin) {
-                currentVehicle = null;
-                disableChat();
-                document.getElementById('chatMessages').innerHTML = `
-                    <div class="welcome-message">
-                        <h3>Добро пожаловать!</h3>
-                        <p>Для начала работы:</p>
-                        <p>1. Добавьте автомобиль через форму слева</p>
-                        <p>2. Выберите автомобиль из списка</p>
-                        <p>3. Спросите ИИ о нужной запчасти</p>
+        // Display current vehicle
+        function displayCurrentVehicle(vehicle) {
+            currentVehicleInfo.classList.remove('hidden');
+            vehicleDetails.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Автомобиль</p>
+                        <p style="font-weight: 600; font-size: 1.1rem;">${vehicle.fullName || `${vehicle.make} ${vehicle.model}`}</p>
                     </div>
-                `;
-                document.getElementById('currentVehicleInfo').style.display = 'none';
-            }
-            
-            renderVehicleList();
-        };
-
-        // Update current vehicle info display
-        function updateCurrentVehicleInfo() {
-            const infoElement = document.getElementById('currentVehicleInfo');
-            if (currentVehicle) {
-                infoElement.textContent = `${currentVehicle.detectedInfo} (${currentVehicle.year})`;
-                infoElement.style.display = 'inline-block';
-            } else {
-                infoElement.style.display = 'none';
-            }
+                    <div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">VIN</p>
+                        <p style="font-family: monospace; font-weight: 600;">${vehicle.vin}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Год выпуска</p>
+                        <p style="font-weight: 600;">${vehicle.year}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Двигатель</p>
+                        <p style="font-weight: 600;">${vehicle.engine || 'Не указан'}</p>
+                    </div>
+                    ${vehicle.bodyType ? `
+                    <div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Кузов</p>
+                        <p style="font-weight: 600;">${vehicle.bodyType}</p>
+                    </div>
+                    ` : ''}
+                    ${vehicle.driveType ? `
+                    <div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Привод</p>
+                        <p style="font-weight: 600;">${vehicle.driveType}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
         }
 
-        // Enable chat
-        function enableChat() {
-            document.getElementById('chatInput').disabled = false;
-            document.getElementById('sendBtn').disabled = false;
-        }
+        // Initialize chat
+        function initializeChat(vehicle) {
+            chatContainer.classList.remove('hidden');
+            chatHistory = [
+                {
+                    role: 'system',
+                    content: SYSTEM_PROMPT
+                },
+                {
+                    role: 'assistant',
+                    content: `Здравствуйте! Я определил ваш автомобиль: **${vehicle.fullName || `${vehicle.make} ${vehicle.model}`}** (${vehicle.year} г.в., VIN: ${vehicle.vin}).\n\nКакая запчасть вас интересует? Напишите название детали, и я подберу для неё оригинальный номер и подходящие аналоги.`
+                }
+            ];
 
-        // Disable chat
-        function disableChat() {
-            document.getElementById('chatInput').disabled = true;
-            document.getElementById('sendBtn').disabled = true;
-        }
-
-        // Add message to chat
-        function addMessage(role, content) {
-            if (currentVehicle) {
-                vehicleChatHistories[currentVehicle.vin].push({ role, content });
-            }
             renderChat();
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+            chatInput.focus();
         }
 
         // Render chat messages
         function renderChat() {
-            const chatMessages = document.getElementById('chatMessages');
-            const messages = currentVehicle ? vehicleChatHistories[currentVehicle.vin] : [];
+            chatMessages.innerHTML = '';
+            
+            chatHistory.forEach((message, index) => {
+                if (message.role === 'system') return;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${message.role === 'user' ? 'user' : 'ai'}`;
+                
+                // Convert markdown-like formatting to HTML
+                let content = message.content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/• /g, '<li>')
+                    .replace(/\n- /g, '\n<li>');
+                
+                // Wrap lists
+                content = content.replace(/(<li>.*?(?:<br>|<\/li>))/gs, '<ul>$1</ul>');
+                content = content.replace(/<\/ul><ul>/g, '');
+                
+                // Highlight part numbers
+                content = content.replace(/([A-Z0-9]{8,15})/g, '<span class="part-number">$1</span>');
 
-            if (messages.length === 0) {
-                chatMessages.innerHTML = `
-                    <div class="welcome-message">
-                        <h3>Добро пожаловать!</h3>
-                        <p>Для начала работы:</p>
-                        <p>1. Добавьте автомобиль через форму слева</p>
-                        <p>2. Выберите автомобиль из списка</p>
-                        <p>3. Спросите ИИ о нужной запчасти</p>
-                    </div>
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
                 `;
-                return;
-            }
-
-            chatMessages.innerHTML = messages.map(msg => {
-                if (msg.role === 'user') {
-                    return `
-                        <div class="message user">
-                            <div class="message-content">${escapeHtml(msg.content)}</div>
-                        </div>
-                    `;
-                } else {
-                    // Process AI message for formatting
-                    let formattedContent = formatAIMessage(msg.content);
-                    return `
-                        <div class="message ai">
-                            <div class="message-content">${formattedContent}</div>
-                        </div>
-                    `;
-                }
-            }).join('');
+                
+                chatMessages.appendChild(messageDiv);
+            });
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Format AI message with parts results
-        function formatAIMessage(content) {
-            // Convert markdown-style bold to HTML
-            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            content = content.replace(/\n/g, '<br>');
-            
-            // Add styling for parts sections
-            content = content.replace(/(✅ ОРИГИНАЛЬНЫЙ НОМЕР:)/g, '<div class="parts-result"><h4>$1</h4>');
-            content = content.replace(/(🔄 АНАЛОГИ:)/g, '</div><div class="parts-result"><h4>$1</h4>');
-            content = content.replace(/(💡 Рекомендация:)/g, '</div><div class="parts-result"><h4>$1</h4>');
-            content = content.replace(/(🚗 Автомобиль:)/g, '<h4>$1</h4>');
-            content = content.replace(/(🔧 Запчасть:)/g, '<h4>$1</h4>');
-            
-            // Close last div if opened
-            if (content.includes('<div class="parts-result">')) {
-                content += '</div>';
-            }
+        // Send message to AI
+        async function sendMessage() {
+            const userMessage = chatInput.value.trim();
+            if (!userMessage || isAITyping || !currentVehicle) return;
 
-            return content;
-        }
+            // Add user message to history
+            chatHistory.push({
+                role: 'user',
+                content: userMessage
+            });
 
-        // Escape HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Clear chat
-        window.clearChat = function() {
-            if (currentVehicle) {
-                vehicleChatHistories[currentVehicle.vin] = [];
-                addMessage('ai', `Чат очищен. ${currentVehicle.detectedInfo} (${currentVehicle.year} год, двигатель ${currentVehicle.engine}L).\n\nКакая запчасть вас интересует?`);
-            }
-        };
-
-        // Send message
-        window.sendMessage = async function() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message || !currentVehicle) return;
-
-            // Add user message
-            addMessage('user', message);
-            input.value = '';
+            chatInput.value = '';
+            renderChat();
+            isAITyping = true;
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
 
             // Show typing indicator
-            showTypingIndicator();
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message message-ai';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                // Prepare messages for AI
-                const messages = [
-                    {
-                        role: 'system',
-                        content: SYSTEM_INSTRUCTION
-                    },
-                    {
-                        role: 'user',
-                        content: `Автомобиль: ${currentVehicle.detectedInfo}\nГод: ${currentVehicle.year}\nДвигатель: ${currentVehicle.engine}L\nVIN: ${currentVehicle.vin}\n\nЗапрос пользователя: ${message}`
+                // Add vehicle context to the message
+                const vehicleContext = `\nКонтекст автомобиля:\n- Марка: ${currentVehicle.make}\n- Модель: ${currentVehicle.model}\n- Год: ${currentVehicle.year}\n- VIN: ${currentVehicle.vin}\n- Двигатель: ${currentVehicle.engine || 'Не указан'}\n- Кузов: ${currentVehicle.bodyType || 'Не указан'}`;
+
+                // Попытка отправки с перебором моделей при ошибке
+                let stream = null;
+                let lastError = null;
+                
+                for (let i = 0; i < MODELS.length; i++) {
+                    const modelIndex = (currentModelIndex + i) % MODELS.length;
+                    const currentModel = MODELS[modelIndex];
+                    
+                    try {
+                        stream = await openrouter.chat.send({
+                            model: currentModel,
+                            messages: chatHistory.map(msg => ({
+                                role: msg.role,
+                                content: msg.role === 'user' ? msg.content + vehicleContext : msg.content
+                            })),
+                            stream: true
+                        });
+                        currentModelIndex = modelIndex; // Запоминаем рабочую модель
+                        break;
+                    } catch (modelError) {
+                        lastError = modelError;
+                        console.warn(`Модель ${currentModel} не ответила:`, modelError.message);
+                        continue;
                     }
-                ];
+                }
+                
+                if (!stream) {
+                    throw new Error(`Ни одна из моделей не ответила. Последняя ошибка: ${lastError?.message || 'Неизвестная ошибка'}`);
+                }
 
-                // Stream response from OpenRouter
-                const stream = await openrouter.chat.send({
-                    model: "arcee-ai/trinity-large-preview:free",
-                    messages: messages,
-                    stream: true
-                });
-
-                // Hide typing indicator
-                hideTypingIndicator();
+                // Remove typing indicator
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
 
                 // Create AI message placeholder
-                let aiResponse = '';
                 const aiMessageDiv = document.createElement('div');
-                aiMessageDiv.className = 'message ai';
+                aiMessageDiv.className = 'message message-ai';
                 aiMessageDiv.innerHTML = '<div class="message-content"></div>';
-                document.getElementById('chatMessages').appendChild(aiMessageDiv);
-                const contentDiv = aiMessageDiv.querySelector('.message-content');
+                chatMessages.appendChild(aiMessageDiv);
 
-                // Stream the response
+                const contentDiv = aiMessageDiv.querySelector('.message-content');
+                let aiResponse = '';
+
                 for await (const chunk of stream) {
                     const content = chunk.choices[0]?.delta?.content;
                     if (content) {
                         aiResponse += content;
-                        contentDiv.innerHTML = formatAIMessage(aiResponse);
-                        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                        // Update content with formatting
+                        let formattedContent = aiResponse
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\n/g, '<br>')
+                            .replace(/• /g, '<li>')
+                            .replace(/\n- /g, '\n<li>');
+                        
+                        formattedContent = formattedContent.replace(/(<li>.*?(?:<br>|<\/li>))/gs, '<ul>$1</ul>');
+                        formattedContent = formattedContent.replace(/<\/ul><ul>/g, '');
+                        formattedContent = formattedContent.replace(/([A-Z0-9]{8,15})/g, '<span class="part-number">$1</span>');
+                        
+                        contentDiv.innerHTML = formattedContent;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
                     }
                 }
 
-                // Save AI response to history
-                if (currentVehicle) {
-                    vehicleChatHistories[currentVehicle.vin].push({ 
-                        role: 'ai', 
-                        content: aiResponse 
-                    });
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                hideTypingIndicator();
-                addMessage('ai', 'Извините, произошла ошибка при обработке запроса. Пожалуйста, попробуйте снова.');
-            }
-        };
-
-        // Show typing indicator
-        function showTypingIndicator() {
-            const chatMessages = document.getElementById('chatMessages');
-            const indicator = document.createElement('div');
-            indicator.id = 'typingIndicator';
-            indicator.className = 'message ai';
-            indicator.innerHTML = `
-                <div class="message-content">
-                    <div class="typing-indicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            `;
-            chatMessages.appendChild(indicator);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Hide typing indicator
-        function hideTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) {
-                indicator.remove();
-            }
-        }
-
-        // Add vehicle form submit
-        document.getElementById('addVehicleForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const vin = document.getElementById('vin').value.toUpperCase().trim();
-            const year = document.getElementById('year').value;
-            const engine = document.getElementById('engine').value;
-
-            if (!vin || !year || !engine) {
-                alert('Пожалуйста, заполните все поля');
-                return;
-            }
-
-            // Check if vehicle already exists
-            if (vehicles.some(v => v.vin === vin)) {
-                alert('Автомобиль с таким VIN уже добавлен');
-                return;
-            }
-
-            const submitBtn = this.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<span class="spinner"></span> Определение...';
-            submitBtn.disabled = true;
-
-            try {
-                // Use AI to detect vehicle information from VIN
-                const messages = [
-                    {
-                        role: 'system',
-                        content: `Ты - эксперт по расшифровке VIN номеров автомобилей. На основе предоставленного VIN номера, года выпуска и объёма двигателя, определи полную информацию об автомобиле.
-
-Формат ответа должен быть ТОЛЬКО: МАРКА МОДЕЛЬ КОМПЛЕКТАЦИЯ
-
-Примеры:
-- Toyota Camry 3.5 V6 XLE
-- BMW 5 Series 520d M Sport
-- Mercedes-Benz E-Class E220 d AMG Line
-
-Не добавляй никаких дополнительных объяснений, только название автомобиля.`
-                    },
-                    {
-                        role: 'user',
-                        content: `VIN: ${vin}\nГод: ${year}\nДвигатель: ${engine}L\n\nОпредели марку, модель и комплектацию автомобиля.`
-                    }
-                ];
-
-                const response = await openrouter.chat.send({
-                    model: "arcee-ai/trinity-large-preview:free",
-                    messages: messages
+                // Add AI response to history
+                chatHistory.push({
+                    role: 'assistant',
+                    content: aiResponse
                 });
 
-                const detectedInfo = response.choices[0]?.message?.content?.trim() || `${year} год, ${engine}L`;
-
-                // Add vehicle to list
-                const vehicle = {
-                    vin,
-                    year,
-                    engine,
-                    detectedInfo,
-                    addedAt: new Date().toISOString()
-                };
-
-                vehicles.push(vehicle);
-                localStorage.setItem('vehicles', JSON.stringify(vehicles));
-
-                // Reset form
-                this.reset();
-                
-                // Re-render and select the new vehicle
-                renderVehicleList();
-                selectVehicle(vin);
-
             } catch (error) {
-                console.error('Error detecting vehicle:', error);
-                alert('Ошибка при определении автомобиля. Пожалуйста, проверьте VIN и попробуйте снова.');
+                console.error('Send message error:', error);
+                showNotification(`Ошибка отправки сообщения: ${error.message}`, 'error');
                 
-                // Add vehicle anyway with basic info
-                const vehicle = {
-                    vin,
-                    year,
-                    engine,
-                    detectedInfo: `Автомобиль ${year} года`,
-                    addedAt: new Date().toISOString()
-                };
-                vehicles.push(vehicle);
-                localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                renderVehicleList();
+                // Remove typing indicator
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+                
+                // Add error message
+                chatHistory.push({
+                    role: 'assistant',
+                    content: 'Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте ещё раз.'
+                });
+                renderChat();
             } finally {
-                submitBtn.innerHTML = 'Определить автомобиль';
-                submitBtn.disabled = false;
+                isAITyping = false;
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
             }
-        });
+        }
 
-        // Handle Enter key in chat input
-        document.getElementById('chatInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+        // Clear chat
+        function clearChat() {
+            if (!currentVehicle) return;
+            
+            chatHistory = [
+                {
+                    role: 'system',
+                    content: SYSTEM_PROMPT
+                },
+                {
+                    role: 'assistant',
+                    content: `Чат очищен. Ваш автомобиль: **${currentVehicle.fullName || `${currentVehicle.make} ${currentVehicle.model}`}** (${currentVehicle.year} г.в.).\n\nКакая запчасть вас интересует?`
+                }
+            ];
+            
+            renderChat();
+            showNotification('Чат очищен', 'success');
+        }
+
+        // Save vehicle
+        function saveVehicle() {
+            if (!currentVehicle) return;
+
+            // Check if already saved
+            const existingIndex = savedVehicles.findIndex(v => v.vin === currentVehicle.vin);
+            if (existingIndex !== -1) {
+                savedVehicles[existingIndex] = currentVehicle;
+            } else {
+                savedVehicles.push(currentVehicle);
+            }
+
+            localStorage.setItem('savedVehicles', JSON.stringify(savedVehicles));
+            localStorage.setItem('lastActiveVehicle', currentVehicle.id);
+            
+            renderSavedVehicles();
+            showNotification('Автомобиль сохранён', 'success');
+        }
+
+        // Select vehicle from saved list
+        function selectVehicle(vehicle) {
+            currentVehicle = vehicle;
+            
+            // Fill form
+            vinInput.value = vehicle.vin;
+            yearSelect.value = vehicle.year;
+            engineInput.value = vehicle.engine || '';
+            
+            displayCurrentVehicle(vehicle);
+            initializeChat(vehicle);
+            saveVehicleBtn.disabled = false;
+            
+            localStorage.setItem('lastActiveVehicle', vehicle.id);
+            
+            // Highlight selected vehicle
+            document.querySelectorAll('.vehicle-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.id === vehicle.id) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Render saved vehicles
+        function renderSavedVehicles() {
+            if (savedVehicles.length === 0) {
+                vehiclesGrid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1/-1;">Нет сохранённых автомобилей</p>';
+                return;
+            }
+
+            vehiclesGrid.innerHTML = '';
+            savedVehicles.forEach(vehicle => {
+                const vehicleItem = document.createElement('div');
+                vehicleItem.className = `vehicle-item ${currentVehicle?.id === vehicle.id ? 'active' : ''}`;
+                vehicleItem.dataset.id = vehicle.id;
+                vehicleItem.innerHTML = `
+                    <button class="delete-vehicle" data-id="${vehicle.id}">✕</button>
+                    <div class="vehicle-info">
+                        <h3>${vehicle.fullName || `${vehicle.make} ${vehicle.model}`}</h3>
+                        <p><strong>VIN:</strong> ${vehicle.vin}</p>
+                        <p><strong>Год:</strong> ${vehicle.year}</p>
+                        <p><strong>Двигатель:</strong> ${vehicle.engine || 'Не указан'}</p>
+                    </div>
+                `;
+                
+                vehicleItem.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('delete-vehicle')) {
+                        selectVehicle(vehicle);
+                    }
+                });
+                
+                vehiclesGrid.appendChild(vehicleItem);
+            });
+        }
+
+        // Delete vehicle
+        function deleteVehicle(id, event) {
+            event.stopPropagation();
+            savedVehicles = savedVehicles.filter(v => v.id !== id);
+            localStorage.setItem('savedVehicles', JSON.stringify(savedVehicles));
+            
+            if (currentVehicle?.id === id) {
+                currentVehicle = null;
+                currentVehicleInfo.classList.add('hidden');
+                chatContainer.classList.add('hidden');
+                saveVehicleBtn.disabled = true;
+                localStorage.removeItem('lastActiveVehicle');
+            }
+            
+            renderSavedVehicles();
+            showNotification('Автомобиль удалён', 'success');
+        }
+
+        // Disable/Enable form
+        function disableForm(disabled) {
+            vinInput.disabled = disabled;
+            yearSelect.disabled = disabled;
+            engineInput.disabled = disabled;
+            detectBtn.disabled = disabled;
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                info: '#6366f1'
+            };
+
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type]};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 12px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                font-weight: 500;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Event Listeners
+        detectBtn.addEventListener('click', detectVehicle);
+        saveVehicleBtn.addEventListener('click', saveVehicle);
+        sendBtn.addEventListener('click', sendMessage);
+        clearChatBtn.addEventListener('click', clearChat);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !isAITyping) {
                 sendMessage();
             }
         });
 
-        // Initialize
-        populateYearDropdown();
-        renderVehicleList();
+        // Delegated event for delete buttons
+        vehiclesGrid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-vehicle')) {
+                deleteVehicle(e.target.dataset.id, e);
+            }
+        });
 
-        // Make functions globally available
-        window.selectVehicle = selectVehicle;
-        window.deleteVehicle = deleteVehicle;
-        window.clearChat = clearChat;
-        window.sendMessage = sendMessage;
+        // Initialize app
+        init();
     </script>
 </body>
 </html>
